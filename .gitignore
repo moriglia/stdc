@@ -1,0 +1,5 @@
+src/cython/*.c
+build/
+libs/
+**/__pycache__/
+*.so
