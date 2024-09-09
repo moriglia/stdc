@@ -1,6 +1,6 @@
 ! SPDX-License-Identifier: GPL-3.0-or-later
 
-subroutine filteriir(b, Nb, a, Na, x, Nx, y, y_initial) bind(C)
+subroutine filteriir(b, Nb, a, Na, x, Nx, y, y_initial)
   use iso_c_binding, only: c_double, c_long
   implicit none
 
@@ -62,7 +62,6 @@ subroutine filteriir(b, Nb, a, Na, x, Nx, y, y_initial) bind(C)
      bnorm = b
      anorm = -a(2:)
   end if
-  print *,anorm, "\n", bnorm
   
   ! ------------------
   ! --- simulation ---

@@ -22,15 +22,18 @@ stdc/dummy.$(CPYSUFFIX)   : lib/libdummy.so
 stdc/tdomain.$(CPYSUFFIX) : lib/libstdc.so
 
 
-##############################
-# Generic recipe for objects #
-##############################
+#######################
+# Recipes for objects #
+#######################
 
-OBJRECIPE = gfortran -c $(wordlist 2, $(words $^),$^) -fpic -o $@
-build/%.o : build/ $(FORTDIR)/%.f*
-	$(OBJRECIPE)
-build/%.o : build/ $(FORTDIR)/lib%/*.f*
-	$(OBJRECIPE)
+
+build/stdc/%.o : $(FORTDIR)/libstdc/%.f* build/stdc/
+	gfortran -c $< -fpic -o $@
+build/cern/%.o : $(FORTDIR)/libcern/%.f* build/cern/
+	gfortran -c $< -fpic -o $@
+
+build/%.o : $(FORTDIR)/%.f* build/
+	gfortran -c $< -fpic -o $@
 
 
 ###############################
@@ -39,11 +42,16 @@ build/%.o : build/ $(FORTDIR)/lib%/*.f*
 
 LIBNAMES = dummy stdc cern
 LIBS = $(foreach libname,$(LIBNAMES),lib/lib$(libname).so)
-
 libs : $(LIBS) lib/ build/
 
-lib/lib%.so :  build/%.o lib/
+lib/libdummy.so: build/dummy.o lib/
 	gfortran -shared $< -o $@
+lib/libstdc.so : $(patsubst $(FORTDIR)/libstdc/%.f90, build/stdc/%.o, $(wildcard $(FORTDIR)/libstdc/*.f90))
+lib/libcern.so : $(patsubst $(FORTDIR)/libcern/%.f, build/cern/%.o, $(wildcard $(FORTDIR)/libcern/*.f))
+
+
+lib/lib%.so : lib/
+	gfortran -shared build/$*/*.o -o $@
 
 
 ###########
