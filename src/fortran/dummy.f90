@@ -30,3 +30,11 @@ function inner_prod(a,b) bind(C)
 end function inner_prod
 
   
+subroutine print_array(x, N)
+  use iso_c_binding, only: c_double, c_long
+
+  integer(kind=c_long), intent(in) :: N
+  real(kind=c_double), intent(in) :: x(N)
+
+  print *, x(1:N)
+end subroutine print_array

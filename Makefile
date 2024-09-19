@@ -3,7 +3,7 @@ CPYSUFFIX ?= cpython-310-x86_64-linux-gnu.so
 
 .PHONY: stdc libs
 
-ALLMODULES = $(addprefix stdc/,$(addsuffix .$(CPYSUFFIX), dummy tdomain))
+ALLMODULES = $(addprefix stdc/,$(addsuffix .$(CPYSUFFIX), dummy tdomain linconv))
 stdc: $(ALLMODULES)
 
 stdc/%.$(CPYSUFFIX): src/cython/%.pyx
@@ -19,8 +19,8 @@ stdc/%.$(CPYSUFFIX): src/cython/%.pyx
 # Module dependancies #
 #######################
 stdc/dummy.$(CPYSUFFIX)   : lib/libdummy.so
-stdc/tdomain.$(CPYSUFFIX) : lib/libstdc.so
-
+stdc/tdomain.$(CPYSUFFIX) : build/stdc/filteriir.o build/stdc/filterbutterworth2iir.o
+stdc/linconv.$(CPYSUFFIX) : lib/libcern.so lib/libstdc.so # build/stdc/linconv.o build/cern/fft.o
 
 #######################
 # Recipes for objects #
@@ -28,12 +28,12 @@ stdc/tdomain.$(CPYSUFFIX) : lib/libstdc.so
 
 
 build/stdc/%.o : $(FORTDIR)/libstdc/%.f* build/stdc/
-	gfortran -c $< -fpic -o $@
+	gfortran -O2 -c $< -fpic -o $@
 build/cern/%.o : $(FORTDIR)/libcern/%.f* build/cern/
-	gfortran -c $< -fpic -o $@
+	gfortran -O2 -c $< -fpic -o $@
 
 build/%.o : $(FORTDIR)/%.f* build/
-	gfortran -c $< -fpic -o $@
+	gfortran -O2 -c $< -fpic -o $@
 
 
 ###############################
@@ -47,7 +47,8 @@ libs : $(LIBS) lib/ build/
 lib/libdummy.so: build/dummy.o lib/
 	gfortran -shared $< -o $@
 lib/libstdc.so : $(patsubst $(FORTDIR)/libstdc/%.f90, build/stdc/%.o, $(wildcard $(FORTDIR)/libstdc/*.f90))
-lib/libcern.so : $(patsubst $(FORTDIR)/libcern/%.f, build/cern/%.o, $(wildcard $(FORTDIR)/libcern/*.f))
+# lib/libcern.so : $(patsubst $(FORTDIR)/libcern/%.f, build/cern/%.o, $(wildcard $(FORTDIR)/libcern/*.f))
+lib/libcern.so : build/cern/fft.o
 
 
 lib/lib%.so : lib/

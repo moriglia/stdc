@@ -16,8 +16,15 @@ all_extensions = {
     "tdomain" :  Extension(
         name = "tdomain",
         sources = ["src/cython/tdomain.pyx"],
-        libraries = ["stdc"],
-        library_dirs = ["lib"]
+        extra_objects = ["build/stdc/filteriir.o",
+                         "build/stdc/filterbutterworth2iir.o"]
+    ),
+    "linconv" : Extension(
+        name = "linconv",
+        sources = ["src/cython/linconv.pyx"],
+        libraries = ["gfortran"],
+        extra_objects = ["build/cern/fft.o",
+                         "build/stdc/linconv.o"]
     )
 }
 

@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 
 D = 10.0 # 10 s
-Fs = np.double(5e3) # 1 kHz
+Fs = np.double(5e3) # 5 kHz
 N = math.ceil(D*Fs)
 
 
